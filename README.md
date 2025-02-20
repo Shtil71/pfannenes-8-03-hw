@@ -5,10 +5,10 @@
 
 
 
-![Alt text](111.jpg)
-![Alt text](222.jpg)
+![Alt text](1111.jpg)
+![Alt text](2222.jpg)
 ### Задание 2. Kibana
 
 ![Alt text](444.jpg)
 
-![Alt text](333.jpg)
+![Alt text](3333.jpg)
