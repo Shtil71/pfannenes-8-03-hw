@@ -2,13 +2,11 @@
 
 
 ### Задание 1
-Предположим, что у вас есть следующие таблицы:
-
+Даны следующие таблицы:
 stores (магазины): store_id, city
-
 staff (сотрудники): staff_id, first_name, last_name, store_id
-
 customers (покупатели): customer_id, store_id
+Тогда решение задания следующее -
 
     SELECT 
         s.last_name, 
@@ -27,8 +25,8 @@ customers (покупатели): customer_id, store_id
         COUNT(c.customer_id) > 300;
   
 ### Задание 2
-Предположим, что у вас есть таблица films с колонками film_id, title, length.
-
+Представим, что есть таблица films с колонками film_id, title, length.
+Тогда решение задания следующее -
 
     SELECT 
         COUNT(*) AS films_above_average_length
@@ -38,8 +36,8 @@ customers (покупатели): customer_id, store_id
         length > (SELECT AVG(length) FROM films);
   
 ### Задание 3
-Предположим, что у вас есть таблица payments с колонками payment_id, amount, payment_date, и таблица rentals с колонками rental_id, rental_date.
-
+Представим, что есть таблица payments с колонками payment_id, amount, payment_date, и таблица rentals с колонками rental_id, rental_date.
+Тогда решение задания следующее -
 
     SELECT 
         EXTRACT(MONTH FROM p.payment_date) AS payment_month,
