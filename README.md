@@ -1,41 +1,57 @@
-# Домашнее задание к занятию "`SQL. Часть 1`" - `Пфанненштиль Евгений`
+# Домашнее задание к занятию "`SQL. Часть 2`" - `Пфанненштиль Евгений`
 
 
 ### Задание 1
-Для получения уникальных названий районов из таблицы с адресами, которые начинаются на "K" и заканчиваются на "a", и не содержат пробелов:
+Предположим, что у вас есть следующие таблицы:
 
-    SELECT DISTINCT district
-    FROM address
-    WHERE district LIKE 'K%a' 
-      AND district NOT LIKE '% %';
+stores (магазины): store_id, city
+
+staff (сотрудники): staff_id, first_name, last_name, store_id
+
+customers (покупатели): customer_id, store_id
+
+    SELECT 
+        s.last_name, 
+        s.first_name, 
+        st.city, 
+        COUNT(c.customer_id) AS customer_count
+    FROM 
+        stores st
+    JOIN 
+        staff s ON st.store_id = s.store_id
+    JOIN 
+        customers c ON st.store_id = c.store_id
+    GROUP BY 
+        st.store_id, s.staff_id
+    HAVING 
+        COUNT(c.customer_id) > 300;
   
 ### Задание 2
-Для получения информации по платежам, которые выполнялись в промежуток с 15 июня 2005 года по 18 июня 2005 года включительно и стоимость которых превышает 10.00:
-
-
-    SELECT *
-    FROM payment
-    WHERE payment_date BETWEEN '2005-06-15' AND '2005-06-18 23:59:59'
-      AND amount > 10.00;
-  
-### Задание 3
-Для получения последних пяти аренд фильмов:
-
-
-    SELECT *
-    FROM rental
-    ORDER BY rental_date DESC
-    LIMIT 5;
-
-### Задание 4
-Для получения активных покупателей, имена которых "Kelly" или "Willie", с преобразованием букв в нижний регистр и заменой 'll' на 'pp' в именах:
+Предположим, что у вас есть таблица films с колонками film_id, title, length.
 
 
     SELECT 
-        LOWER(first_name) AS first_name, 
-        LOWER(last_name) AS last_name,
-        REPLACE(LOWER(first_name), 'll', 'pp') AS modified_first_name
-    FROM customer
-    WHERE active = 1 
-          AND (first_name = 'Kelly' OR first_name = 'Willie');
+        COUNT(*) AS films_above_average_length
+    FROM 
+        films
+    WHERE 
+        length > (SELECT AVG(length) FROM films);
+  
+### Задание 3
+Предположим, что у вас есть таблица payments с колонками payment_id, amount, payment_date, и таблица rentals с колонками rental_id, rental_date.
+
+
+    SELECT 
+        EXTRACT(MONTH FROM p.payment_date) AS payment_month,
+        SUM(p.amount) AS total_payments,
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        payments p
+    JOIN 
+        rentals r ON p.rental_id = r.rental_id
+    GROUP BY 
+        EXTRACT(MONTH FROM p.payment_date)
+    ORDER BY 
+        total_payments DESC
+    LIMIT 1;
 
