@@ -37,19 +37,18 @@ customers (покупатели): customer_id, store_id
   
 ### Задание 3
 Представим, что есть таблица payments с колонками payment_id, amount, payment_date, и таблица rentals с колонками rental_id, rental_date.
-Тогда решение задания следующее -
+Тогда решение задания следующее (обновлено с использованием date_format)-
 
     SELECT 
-        EXTRACT(MONTH FROM p.payment_date) AS payment_month,
-        SUM(p.amount) AS total_payments,
+        DATE_FORMAT(payment_date, '%Y-%m') AS payment_month,
+        SUM(amount) AS total_amount,
         COUNT(r.rental_id) AS rental_count
     FROM 
         payments p
     JOIN 
-        rentals r ON p.rental_id = r.rental_id
+        rentals r ON DATE_FORMAT(p.payment_date, '%Y-%m') = DATE_FORMAT(r.rental_date, '%Y-%m')
     GROUP BY 
-        EXTRACT(MONTH FROM p.payment_date)
+        payment_month
     ORDER BY 
-        total_payments DESC
+        total_amount DESC
     LIMIT 1;
-
