@@ -1,54 +1,45 @@
-# Домашнее задание к занятию "`SQL. Часть 2`" - `Пфанненштиль Евгений`
+# Домашнее задание к занятию "`Индексы`" - `Пфанненштиль Евгений`
 
 
 ### Задание 1
-Даны следующие таблицы:
-stores (магазины): store_id, city
-staff (сотрудники): staff_id, first_name, last_name, store_id
-customers (покупатели): customer_id, store_id
-Тогда решение задания следующее -
+
+Запрос:
 
     SELECT 
-        s.last_name, 
-        s.first_name, 
-        st.city, 
-        COUNT(c.customer_id) AS customer_count
+        (SUM(pg_total_relation_size(indexrelid)) * 100.0 / SUM(pg_total_relation_size(relid))) AS index_to_table_size_ratio
     FROM 
-        stores st
+        pg_index
     JOIN 
-        staff s ON st.store_id = s.store_id
-    JOIN 
-        customers c ON st.store_id = c.store_id
-    GROUP BY 
-        st.store_id, s.staff_id
-    HAVING 
-        COUNT(c.customer_id) > 300;
+        pg_class ON pg_index.indrelid = pg_class.oid
+    WHERE 
+        pg_class.relkind = 'r';  -- учитываем только таблицы (relkind = 'r')
   
 ### Задание 2
-Представим, что есть таблица films с колонками film_id, title, length.
-Тогда решение задания следующее -
 
-    SELECT 
-        COUNT(*) AS films_above_average_length
-    FROM 
-        films
-    WHERE 
-        length > (SELECT AVG(length) FROM films);
-  
-### Задание 3
-Представим, что есть таблица payments с колонками payment_id, amount, payment_date, и таблица rentals с колонками rental_id, rental_date.
-Тогда решение задания следующее (обновлено с использованием date_format)-
+Узкие места - DISTINCT, Оконная функция SUM с PARTITION BY, Использование date(p.payment_date) и отсутсвие индексов.
 
+Оптимизированная версия запроса:
+
+    -- Создание индексов (если их нет)
+    CREATE INDEX idx_payment_date ON payment(payment_date);
+    CREATE INDEX idx_rental_date ON rental(rental_date);
+    CREATE INDEX idx_customer_id ON customer(customer_id);
+    CREATE INDEX idx_inventory_id ON inventory(inventory_id);
+
+    -- Оптимизированный запрос
+    EXPLAIN ANALYZE
     SELECT 
-        DATE_FORMAT(payment_date, '%Y-%m') AS payment_month,
-        SUM(amount) AS total_amount,
-        COUNT(r.rental_id) AS rental_count
+        concat(c.last_name, ' ', c.first_name) AS customer_name,
+        SUM(p.amount) AS total_amount
     FROM 
-        payments p
+        payment p
     JOIN 
-        rentals r ON DATE_FORMAT(p.payment_date, '%Y-%m') = DATE_FORMAT(r.rental_date, '%Y-%m')
+        rental r ON p.payment_date = r.rental_date
+    JOIN 
+        customer c ON r.customer_id = c.customer_id
+    JOIN 
+        inventory i ON r.inventory_id = i.inventory_id
+    WHERE 
+        p.payment_date >= '2005-07-30' AND p.payment_date < '2005-07-31'
     GROUP BY 
-        payment_month
-    ORDER BY 
-        total_amount DESC
-    LIMIT 1;
+        c.customer_id, c.last_name, c.first_name;
