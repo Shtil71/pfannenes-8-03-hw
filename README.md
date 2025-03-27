@@ -1,19 +1,17 @@
-# Домашнее задание к занятию "`Индексы`" - `Пфанненштиль Евгений`
+# Домашнее задание к занятию "`Защита Хоста`" - `Пфанненштиль Евгений`
 
 
 ### Задание 1
 
-Запрос:
+    sudo apt-get update
+    sudo apt-get install ecryptfs-utils
+    sudo adduser cryptouser
+    sudo -i -u cryptouser
+    ecryptfs-migrate-home -u cryptouser
 
-    SELECT 
-        (SUM(pg_total_relation_size(indexrelid)) * 100.0 / SUM(pg_total_relation_size(relid))) AS index_to_table_size_ratio
-    FROM 
-        pg_index
-    JOIN 
-        pg_class ON pg_index.indrelid = pg_class.oid
-    WHERE 
-        pg_class.relkind = 'r';  -- учитываем только таблицы (relkind = 'r')
-  
+![u1](https://github.com/user-attachments/assets/a695c0e0-9f06-43e8-a7cb-0efcc86bceb1)
+
+
 ### Задание 2
 
 Узкие места - DISTINCT, Оконная функция SUM с PARTITION BY, Использование date(p.payment_date) и отсутсвие индексов.
