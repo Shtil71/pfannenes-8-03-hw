@@ -1,23 +1,20 @@
 # Домашнее задание к занятию "`Защита Хоста`" - `Пфанненштиль Евгений`
 
+# Отчёт по сканированию Metasploitable
 
-### Задание 1
+## Задание 1
+### Сетевые службы:
+- 21/tcp: FTP (vsftpd 2.3.4)
+- 22/tcp: SSH (OpenSSH 4.7p1)
+- 80/tcp: HTTP (Apache 2.2.8)
 
-    sudo apt-get update
-    sudo apt-get install ecryptfs-utils
-    sudo adduser cryptouser
-    sudo -i -u cryptouser
-    ecryptfs-migrate-home -u cryptouser
+### Уязвимости:
+1. vsftpd 2.3.4 — [Exploit-DB #49757](https://www.exploit-db.com/exploits/49757)
+2. Samba usermap_script — [Exploit-DB #16320](https://www.exploit-db.com/exploits/16320)
 
-![u1](https://github.com/user-attachments/assets/a695c0e0-9f06-43e8-a7cb-0efcc86bceb1)
-
-
-### Задание 2
-
-    sudo apt-get install cryptsetup
-    sudo fdisk /dev/sda  #создание sda4
-    sudo cryptsetup luksFormat /dev/sda4
-    sudo cryptsetup open /dev/sda4 my_encrypted_partition
-    sudo mkfs.ext4 /dev/mapper/my_encrypted_partition
-    sudo mkdir /mnt/encrypted
-    sudo mount /dev/mapper/my_encrypted_partition /mnt/encrypted
+## Задание 2
+### Сравнение режимов сканирования:
+| Режим  | Ответ сервера       |
+|--------|---------------------|
+| SYN    | SYN/ACK или RST     |
+| FIN    | RST (если порт закрыт) |
